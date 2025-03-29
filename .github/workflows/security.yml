@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install bandit safety checkov
+        pip install bandit safety checkov semgrep
         
     - name: Run Bandit
       run: |
@@ -52,4 +52,29 @@ jobs:
       with:
         target: http://localhost:8000
         rules_file_name: '.zap/rules.tsv'
-        cmd_options: '-a' 
+        cmd_options: '-a'
+        
+    - name: Run Semgrep scan
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: p/python
+        
+    - name: Run Checkov for infrastructure security
+      run: |
+        checkov -d .
+        
+    - name: Run dependency graph check
+      run: |
+        pip install pip-tools
+        pip-compile --output-file=requirements.txt pyproject.toml
+        pip-compile --output-file=requirements-dev.txt pyproject.toml --extra=dev
+        
+    - name: Run license compliance check
+      run: |
+        pip install licensecheck
+        licensecheck
+        
+    - name: Run code signing verification
+      run: |
+        pip install sigstore
+        sigstore verify . 
