@@ -1,0 +1,39 @@
+name: Performance Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly
+
+jobs:
+  performance:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install locust pytest-benchmark
+        
+    - name: Run load tests
+      run: |
+        locust -f tests/locust/locustfile.py --headless -u 100 -r 10 --run-time 1m
+        
+    - name: Run benchmarks
+      run: |
+        pytest tests/benchmarks/ --benchmark-only --benchmark-json=benchmark-results.json
+        
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v2
+      with:
+        name: benchmark-results
+        path: benchmark-results.json 
