@@ -9,4 +9,7 @@ python-dotenv==1.0.0
 pytest-asyncio==0.21.1
 pytest-cov==4.1.0
 black==23.11.0
-mypy==1.7.1 
+mypy==1.7.1
+fastapi==0.109.2
+uvicorn==0.27.1
+neurokit2==0.2.2 

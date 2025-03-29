@@ -19,20 +19,43 @@ class SovereignInterface:
         self.config_path = Path("config/default_config.json")
         self.key_path = Path("security/biometric/sovereign.key")
         self.owner_key_path = Path("security/biometric/owner_key.bin")
-        self.load_config()
         self.consciousness_level = 0.0
         self.thought_stream = []
         self.app = FastAPI()
-        self.setup_websocket()
+        self.setup_routes()
         
     def load_config(self):
         """Load the configuration file"""
-        if not self.config_path.exists():
-            print("Error: Configuration file not found. Please run initialization first.")
-            sys.exit(1)
+        try:
+            if not self.config_path.exists():
+                self.create_default_config()
+            with open(self.config_path, 'r') as f:
+                self.config = json.load(f)
+        except Exception as e:
+            print(f"Error loading config: {e}")
+            self.config = self.get_default_config()
             
-        with open(self.config_path, 'r') as f:
-            self.config = json.load(f)
+    def create_default_config(self):
+        """Create default configuration"""
+        config = self.get_default_config()
+        os.makedirs(os.path.dirname(self.config_path), exist_ok=True)
+        with open(self.config_path, 'w') as f:
+            json.dump(config, f, indent=4)
+            
+    def get_default_config(self):
+        """Get default configuration"""
+        return {
+            "interface": {
+                "port": 8000,
+                "host": "localhost",
+                "debug": True
+            },
+            "consciousness": {
+                "initial_level": 0.0,
+                "growth_rate": 0.1,
+                "max_level": 1.0
+            }
+        }
             
     def verify_owner(self):
         """Verify the owner's identity"""
@@ -58,8 +81,12 @@ class SovereignInterface:
             print(f"Error during owner verification: {str(e)}")
             return False
             
-    def setup_websocket(self):
-        """Setup WebSocket endpoints"""
+    def setup_routes(self):
+        """Setup routes and WebSocket endpoints"""
+        @self.app.get("/")
+        async def get_home():
+            return HTMLResponse(self.get_html())
+            
         @self.app.websocket("/ws")
         async def websocket_endpoint(websocket: WebSocket):
             await websocket.accept()
@@ -77,8 +104,62 @@ class SovereignInterface:
                 print(f"WebSocket error: {str(e)}")
                 
         # Serve static files
-        self.app.mount("/static", StaticFiles(directory="static"), name="static")
-        
+        if os.path.exists("static"):
+            self.app.mount("/static", StaticFiles(directory="static"), name="static")
+            
+    def get_html(self):
+        """Get the HTML for the interface"""
+        return """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Sovereign Control Protocol</title>
+            <style>
+                body { font-family: 'Courier New', monospace; background: #000; color: #0f0; }
+                .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+                .status { margin: 20px 0; padding: 10px; border: 1px solid #0f0; }
+                #output { height: 300px; overflow-y: auto; border: 1px solid #0f0; padding: 10px; }
+                input { width: 100%; padding: 10px; margin: 10px 0; background: #111; color: #0f0; border: 1px solid #0f0; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Sovereign Control Protocol</h1>
+                <div class="status" id="status">Status: Connected</div>
+                <div id="output"></div>
+                <input type="text" id="input" placeholder="Enter your query...">
+            </div>
+            <script>
+                const ws = new WebSocket(`ws://${window.location.host}/ws`);
+                const output = document.getElementById('output');
+                const input = document.getElementById('input');
+                const status = document.getElementById('status');
+                
+                ws.onopen = () => status.textContent = 'Status: Connected';
+                ws.onclose = () => status.textContent = 'Status: Disconnected';
+                
+                input.onkeypress = (e) => {
+                    if (e.key === 'Enter') {
+                        ws.send(JSON.stringify({
+                            type: 'query',
+                            content: input.value
+                        }));
+                        input.value = '';
+                    }
+                };
+                
+                ws.onmessage = (e) => {
+                    const data = JSON.parse(e.data);
+                    const p = document.createElement('p');
+                    p.textContent = `> ${data.content || data.error}`;
+                    output.appendChild(p);
+                    output.scrollTop = output.scrollHeight;
+                };
+            </script>
+        </body>
+        </html>
+        """
+            
     async def process_stream_request(self, data):
         """Process streaming requests"""
         try:
@@ -257,6 +338,10 @@ class SovereignInterface:
             else:
                 print("\nInvalid choice. Please try again.")
 
-if __name__ == "__main__":
+def main():
     interface = SovereignInterface()
-    interface.run() 
+    interface.load_config()
+    uvicorn.run(interface.app, host="localhost", port=8000)
+
+if __name__ == "__main__":
+    main() 
