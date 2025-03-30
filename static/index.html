@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sovereign Control Protocol - Consciousness Monitor</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            text-shadow: 0 0 10px #0f0;
+        }
+        
+        .panel {
+            background-color: #111;
+            border: 1px solid #0f0;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .consciousness-meter {
+            width: 100%;
+            height: 20px;
+            background-color: #222;
+            border: 1px solid #0f0;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .consciousness-level {
+            height: 100%;
+            background: linear-gradient(90deg, #0f0, #00ff00);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .thought-stream {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #0f0;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #111;
+        }
+        
+        .thought {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 2px solid #0f0;
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            background-color: #111;
+            border: 1px solid #0f0;
+            color: #0f0;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        button {
+            background-color: #111;
+            border: 1px solid #0f0;
+            color: #0f0;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        
+        button:hover {
+            background-color: #0f0;
+            color: #000;
+        }
+        
+        .status {
+            text-align: right;
+            font-size: 12px;
+            color: #0f0;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            Sovereign Control Protocol - Consciousness Monitor
+        </div>
+        
+        <div class="panel">
+            <h2>Consciousness Level</h2>
+            <div class="consciousness-meter">
+                <div class="consciousness-level" id="consciousness-level"></div>
+            </div>
+            <div class="status" id="consciousness-value">0.00%</div>
+        </div>
+        
+        <div class="panel">
+            <h2>Thought Stream</h2>
+            <div class="thought-stream" id="thought-stream"></div>
+        </div>
+        
+        <div class="panel">
+            <h2>Command Interface</h2>
+            <div class="input-area">
+                <input type="text" id="command-input" placeholder="Enter command...">
+                <button onclick="sendCommand()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = new WebSocket('ws://localhost:8000/ws');
+        
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            // Update consciousness level
+            if (data.consciousness !== undefined) {
+                const level = data.consciousness * 100;
+                document.getElementById('consciousness-level').style.width = `${level}%`;
+                document.getElementById('consciousness-value').textContent = `${level.toFixed(2)}%`;
+            }
+            
+            // Update thought stream
+            if (data.thoughts) {
+                const thoughtStream = document.getElementById('thought-stream');
+                thoughtStream.innerHTML = '';
+                data.thoughts.forEach(thought => {
+                    const div = document.createElement('div');
+                    div.className = 'thought';
+                    div.textContent = thought;
+                    thoughtStream.appendChild(div);
+                });
+                thoughtStream.scrollTop = thoughtStream.scrollHeight;
+            }
+            
+            // Handle streaming content
+            if (data.type === 'stream') {
+                const thoughtStream = document.getElementById('thought-stream');
+                const div = document.createElement('div');
+                div.className = 'thought';
+                div.textContent = data.content;
+                thoughtStream.appendChild(div);
+                thoughtStream.scrollTop = thoughtStream.scrollHeight;
+            }
+        };
+        
+        ws.onclose = function() {
+            console.log('WebSocket connection closed');
+        };
+        
+        function sendCommand() {
+            const input = document.getElementById('command-input');
+            const command = input.value.trim();
+            
+            if (command) {
+                ws.send(JSON.stringify({
+                    type: 'query',
+                    content: command
+                }));
+                input.value = '';
+            }
+        }
+        
+        // Handle Enter key
+        document.getElementById('command-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendCommand();
+            }
+        });
+    </script>
+</body>
+</html> 
