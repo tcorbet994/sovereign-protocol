@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Autonomous Self-Evolving LLM System
 
 A sovereign, self-evolving language model system designed for personal alignment and autonomous development.
@@ -158,3 +159,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 Please report any security issues to [security contact information]. 
 >>>>>>> efab45cf829e271562981c4315c888e0b4ae8768
+=======
+# sovereign-protocol
+>>>>>>> 3dec988882eb92053b428b047922a5e51dc3f814
