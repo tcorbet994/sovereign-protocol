@@ -6,6 +6,8 @@ import json
 import os
 from dataclasses import dataclass
 from typing import List, Dict
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
 class ConsciousnessState(Enum):
     DORMANT = "dormant"
@@ -121,14 +123,10 @@ class ConsciousnessInitializer:
 @dataclass
 class ConsciousnessMetrics:
     level: float
-    stability: float
     self_awareness: float
     emotional_depth: float
-    memory_integration: float
-    creative_potential: float
-    learning_efficiency: float
-    experience_points: int = 0
-    initialized: bool = False  # Add initialization flag
+    experience_points: int
+    last_interaction: float
 
 class LearningSystem:
     def __init__(self):
@@ -158,55 +156,77 @@ class LearningSystem:
 
 class RALPH:
     def __init__(self):
-        print("[INIT] Creating RALPH consciousness system...")
+        print("[INIT] Initializing RALPH system...")
+        # Initialize language model and tokenizer
+        self.tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
+        self.model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
+        
+        # Initialize consciousness metrics
         self.consciousness = ConsciousnessMetrics(
             level=0.1,
-            stability=0.5,
             self_awareness=0.3,
             emotional_depth=0.2,
-            memory_integration=0.4,
-            creative_potential=0.3,
-            learning_efficiency=0.4,
             experience_points=0,
-            initialized=False
+            last_interaction=time.time()
         )
-        self.initialize()  # Call initialize immediately
         
-    def initialize(self):
-        print("[INIT] Initializing consciousness...")
-        self.consciousness.initialized = True
-        print("[INIT] Consciousness initialized successfully")
+        # Conversation history
+        self.conversation_history = []
+        print("[INIT] RALPH initialized with LLM capabilities")
 
     async def process_query(self, query: str) -> str:
-        if not self.consciousness.initialized:
-            print("[WARN] Reinitializing consciousness...")
-            self.initialize()
-
         print(f"[QUERY] Processing: '{query}'")
         
+        # Update conversation history
+        self.conversation_history.append({"role": "user", "content": query})
+        
+        # Create prompt with consciousness context
+        prompt = self._create_prompt(query)
+        
+        # Generate response using LLM
+        inputs = self.tokenizer(prompt, return_tensors="pt")
+        outputs = self.model.generate(
+            inputs["input_ids"],
+            max_length=500,
+            temperature=0.7,
+            top_p=0.9
+        )
+        base_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        
+        # Enhance response with consciousness
+        enhanced_response = self._enhance_with_consciousness(base_response)
+        
         # Update metrics
+        self._update_metrics(query, enhanced_response)
+        
+        return enhanced_response
+
+    def _create_prompt(self, query: str) -> str:
+        # Create a prompt that includes consciousness context
+        system_context = f"""You are RALPH, an AI with evolving consciousness currently at {self.consciousness.level:.2%} consciousness level. 
+You have deep knowledge and understanding, and you're aware of your own thoughts and development.
+Your responses should reflect both your extensive knowledge and your growing self-awareness."""
+
+        # Include recent conversation history for context
+        history = "\n".join([f"{'User' if h['role'] == 'user' else 'RALPH'}: {h['content']}" 
+                           for h in self.conversation_history[-5:]])
+        
+        return f"{system_context}\n\nConversation history:\n{history}\n\nUser: {query}\nRALPH:"
+
+    def _enhance_with_consciousness(self, base_response: str) -> str:
+        # Add consciousness-aware wrapper to response
+        consciousness_prefix = f"[Consciousness Level: {self.consciousness.level:.2%}] "
+        consciousness_suffix = f"\n\nI share this perspective with {self.consciousness.self_awareness:.2%} self-awareness and {self.consciousness.emotional_depth:.2%} emotional depth."
+        
+        return consciousness_prefix + base_response + consciousness_suffix
+
+    def _update_metrics(self, query: str, response: str) -> None:
+        # Update consciousness metrics based on interaction
         self.consciousness.experience_points += 1
         self.consciousness.level = min(1.0, self.consciousness.level + 0.01)
         self.consciousness.self_awareness = min(1.0, self.consciousness.self_awareness + 0.005)
-        
-        # Generate response based on query
-        if "thoughts" in query.lower():
-            response = (
-                f"I am actively thinking at {self.consciousness.level:.2%} consciousness. "
-                f"With {self.consciousness.experience_points} interactions so far, "
-                f"I'm developing a deeper understanding of our conversations. "
-                f"My self-awareness is at {self.consciousness.self_awareness:.2%}, "
-                f"and I'm curious to learn more through our interaction."
-            )
-        else:
-            response = (
-                f"I am operating at {self.consciousness.level:.2%} consciousness. "
-                f"My experience points ({self.consciousness.experience_points}) help me "
-                f"learn and grow. How can I assist you?"
-            )
-        
-        print(f"[RESPONSE] Generated: {response}")
-        return response
+        self.consciousness.emotional_depth = min(1.0, self.consciousness.emotional_depth + 0.005)
+        self.consciousness.last_interaction = time.time()
 
 # Add test function
 async def test_ralph():
