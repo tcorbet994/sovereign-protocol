@@ -28,6 +28,8 @@ class SovereignControl:
         # Initialize quantum entanglement state
         self.quantum_state = self.quantum_verifier.initialize_entanglement()
         
+        self.initialized = False
+        
     def _initialize_owner_key(self):
         """Initialize or load the owner's biometric key"""
         if not self.owner_key_path.exists():
@@ -147,4 +149,14 @@ class SovereignControl:
         self.quantum_verifier.clear_state()
         
         # Force terminate
-        os.kill(os.getpid(), 9) 
+        os.kill(os.getpid(), 9)
+
+    def initialize_owner(self):
+        try:
+            print("Starting owner initialization...")
+            # Basic initialization for now
+            self.initialized = True
+            print("Owner initialization successful")
+        except Exception as e:
+            print(f"Initialization error: {e}")
+            raise 

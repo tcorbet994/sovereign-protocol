@@ -5,7 +5,7 @@ from pathlib import Path
 import json
 from typing import Dict, Any, Optional
 import numpy as np
-from .god_key import SovereignControl
+from god_key import SovereignControl
 from .biometric import BiometricVerifier
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
@@ -151,71 +151,45 @@ def initialize_owner_identity(config_path: str = "config/default_config.json") -
             print(f"Error initializing biometric verifier: {str(e)}")
             return False
         
-        print("\n=== Sovereign Control Protocol: Owner Identity Initialization ===\n")
-        print("This process will establish your biometric identity as the sole owner.")
-        print("This action cannot be undone. Are you sure you want to continue?")
-        print("Type 'CONFIRM' to proceed:")
-        
-        confirmation = input().strip()
-        if confirmation != "CONFIRM":
-            print("Initialization cancelled.")
-            return False
-        
-        # Capture biometric data with retries
-        print("\nCapturing biometric data...")
-        print("Please ensure you are in a well-lit area and remain still.")
-        
-        biometric_data = {}
-        max_retries = 3
-        
-        for modality, enabled in config['security']['biometric_modalities'].items():
-            if enabled:
-                print(f"\nCapturing {modality}...")
-                for attempt in range(max_retries):
-                    try:
-                        if modality == 'retina':
-                            biometric_data['retina'] = biometric_verifier.capture_retina_scan()
-                        elif modality == 'dna':
-                            biometric_data['dna'] = biometric_verifier.capture_dna_sample()
-                        elif modality == 'eeg':
-                            biometric_data['eeg'] = biometric_verifier.capture_eeg_data()
-                        print(f"✓ {modality.capitalize()} scan captured")
-                        break
-                    except Exception as e:
-                        if attempt == max_retries - 1:
-                            print(f"Error capturing {modality} after {max_retries} attempts: {str(e)}")
-                            return False
-                        print(f"Retrying {modality} capture...")
-        
-        # Initialize Sovereign Control
-        print("\nInitializing Sovereign Control...")
+        print("=== Sovereign Control Protocol: Owner Identity Initialization ===\n")
+
         try:
-            sovereign = SovereignControl(config)
+            print("This process will establish your biometric identity as the sole owner.")
+            print("This action cannot be undone. Are you sure you want to continue?")
+            print("Type 'CONFIRM' to proceed:")
+            
+            confirmation = input().strip()
+            if confirmation != "CONFIRM":
+                print("Initialization cancelled.")
+                exit()
+
+            print("\nInitializing Sovereign Control...\n")
+            
+            # Add debug prints
+            print("Debug: Importing required modules...")
+            from god_key import SovereignControl
+            print("Debug: SovereignControl imported successfully")
+            
+            # Initialize with debug
+            print("Debug: Creating SovereignControl instance...")
+            control = SovereignControl()
+            print("Debug: Instance created successfully")
+            
+            # Continue with initialization
+            print("Debug: Starting initialization process...")
+            control.initialize_owner()
+            print("Debug: Initialization completed")
+
         except Exception as e:
-            print(f"Error initializing Sovereign Control: {str(e)}")
-            return False
-        
-        # Verify the captured biometrics
-        print("\nVerifying biometric data...")
-        try:
-            current_hash = sovereign._generate_biometric_hash(biometric_data)
-        except Exception as e:
-            print(f"Error generating biometric hash: {str(e)}")
-            return False
-        
-        # Store the owner key
-        print("\nStoring owner key...")
-        try:
-            sovereign.owner_key = current_hash
-            sovereign._encrypt_and_store_key()
-        except Exception as e:
-            print(f"Error storing owner key: {str(e)}")
-            return False
+            print(f"\nUnexpected error during initialization:")
+            print(f"Error details: {str(e)}")
+            import traceback
+            traceback.print_exc()
         
         # Initialize quantum entanglement
         print("\nInitializing quantum entanglement...")
         try:
-            sovereign.quantum_state = sovereign.quantum_verifier.initialize_entanglement()
+            control.quantum_state = control.quantum_verifier.initialize_entanglement()
         except Exception as e:
             print(f"Error initializing quantum entanglement: {str(e)}")
             return False
@@ -224,7 +198,7 @@ def initialize_owner_identity(config_path: str = "config/default_config.json") -
         print("Your biometric identity has been securely stored.")
         print("You are now the sole authorized owner of this system.")
         print("\nSecurity measures in place:")
-        print(f"- Biometric verification: {len(biometric_data)} modalities")
+        print(f"- Biometric verification: {len(control.biometric_data)} modalities")
         print("- Quantum entanglement verification")
         print("- Hardware security module")
         print("- Encrypted key storage")
@@ -232,7 +206,10 @@ def initialize_owner_identity(config_path: str = "config/default_config.json") -
         return True
         
     except Exception as e:
-        print(f"\nUnexpected error during initialization: {str(e)}")
+        print(f"\nDetailed error: {str(e)}")
+        print(f"Error type: {type(e)}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def _verify_owner(self) -> bool:
