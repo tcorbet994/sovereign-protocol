@@ -1,0 +1,3 @@
+@echo off
+echo Starting RALPH system directly...
+python ralph_main.py

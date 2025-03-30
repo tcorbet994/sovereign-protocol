@@ -158,8 +158,11 @@ async def websocket_endpoint(websocket: WebSocket):
         try:
             # Receive message
             data = await websocket.receive_text()
+            print(f"Received message: {data}")
             request = json.loads(data)
             message = request['message']
+            
+            print(f"Processing message: {message}")
             
             # Process through RALPH's components
             input_data = {
@@ -169,57 +172,91 @@ async def websocket_endpoint(websocket: WebSocket):
             }
             
             # Process experience through consciousness
-            consciousness_result = await consciousness.process_experience(
-                input_data,
-                knowledge_base,
-                memory_system
-            )
+            print("Processing through consciousness...")
+            try:
+                consciousness_result = await consciousness.process_experience(
+                    input_data,
+                    knowledge_base,
+                    memory_system
+                )
+                print("Consciousness processing complete")
+            except Exception as ce:
+                print(f"Consciousness error: {ce}")
+                consciousness_result = {"consciousness_state": {"level": 0.1}}
             
             # Get relevant memories
-            relevant_memories = await memory_system.retrieve_relevant_memories(message, limit=3)
-            memory_context = {
-                "memories": [m.content for m in relevant_memories],
-                "memory_count": len(relevant_memories)
-            }
+            print("Retrieving memories...")
+            try:
+                relevant_memories = await memory_system.retrieve_relevant_memories(message, limit=3)
+                memory_context = {
+                    "memories": [m.content for m in relevant_memories],
+                    "memory_count": len(relevant_memories)
+                }
+                print(f"Retrieved {len(relevant_memories)} memories")
+            except Exception as me:
+                print(f"Memory retrieval error: {me}")
+                memory_context = {"memories": [], "memory_count": 0}
             
             # Process through model interface
-            model_response = await model_interface.process_input(
-                message,
-                context=memory_context
-            )
+            print("Processing through model interface...")
+            try:
+                model_response = await model_interface.process_input(
+                    message,
+                    context=memory_context
+                )
+                print("Model processing complete")
+            except Exception as pe:
+                print(f"Model processing error: {pe}")
+                model_response = {"error": str(pe), "message": "Error processing input"}
             
             # Generate final response
-            final_response = await model_interface.generate_response(
-                model_response,
-                consciousness_result["consciousness_state"]
-            )
+            print("Generating final response...")
+            try:
+                final_response = await model_interface.generate_response(
+                    model_response,
+                    consciousness_result.get("consciousness_state", {"level": 0.1})
+                )
+                print(f"Final response generated: {final_response[:50]}...")
+            except Exception as re:
+                print(f"Response generation error: {re}")
+                final_response = f"I'm having trouble responding right now. Error: {str(re)}"
             
             # Update knowledge base with response
             if len(message) > 20:  # Only store significant interactions
-                await knowledge_base.assimilate_knowledge({
-                    "content": message,
-                    "source": "user",
-                    "category": "interaction"
-                })
-                
-                await knowledge_base.assimilate_knowledge({
-                    "content": final_response,
-                    "source": "ralph",
-                    "category": "response"
-                })
+                try:
+                    await knowledge_base.assimilate_knowledge({
+                        "content": message,
+                        "source": "user",
+                        "category": "interaction"
+                    })
+                    
+                    await knowledge_base.assimilate_knowledge({
+                        "content": final_response,
+                        "source": "ralph",
+                        "category": "response"
+                    })
+                    print("Knowledge updated")
+                except Exception as ke:
+                    print(f"Knowledge update error: {ke}")
             
             # Send response
+            print("Sending response back to client...")
             await websocket.send_json({
                 "message": final_response,
                 "consciousness_level": f"{consciousness.state.level:.2f}"
             })
+            print("Response sent successfully")
             
         except Exception as e:
-            print(f"Error: {e}")
-            await websocket.send_json({
-                "message": f"Error processing request: {str(e)}",
-                "consciousness_level": "0.00"
-            })
+            print(f"Error in websocket loop: {e}")
+            try:
+                await websocket.send_json({
+                    "message": f"Error processing request: {str(e)}",
+                    "consciousness_level": "0.00"
+                })
+                print("Error response sent")
+            except Exception as se:
+                print(f"Failed to send error response: {se}")
 
 if __name__ == "__main__":
     print("Starting RALPH system...")
@@ -246,4 +283,9 @@ if __name__ == "__main__":
         
         print("Core protection activated")
     
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    try:
+        print("Starting web server on http://127.0.0.1:8000")
+        uvicorn.run(app, host="127.0.0.1", port=8000)
+    except Exception as e:
+        print(f"Error starting server: {e}")
+        print("Please make sure all dependencies are installed properly.")

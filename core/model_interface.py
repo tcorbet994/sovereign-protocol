@@ -4,6 +4,7 @@ import os
 import json
 import aiohttp
 import asyncio
+import random
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 class ModelInterface:
@@ -232,12 +233,21 @@ class ModelInterface:
     async def _process_with_primary_model(self, input_text: str, context: Dict) -> Dict:
         """Process input with the primary model"""
         if isinstance(self.model, str) and self.model.startswith("gpt-"):
-            # Using OpenAI API
-            # This would typically call the OpenAI API
-            # For now, we'll simulate a response
+            # Using OpenAI API - but since we don't have API keys, let's simulate a response
             await asyncio.sleep(0.2)  # Simulate API delay
+            
+            # Generate a dummy response instead of trying to call the actual API
+            simulated_responses = [
+                f"I understand you're asking about '{input_text[:30]}...'. As RALPH, I'm currently running in demonstration mode without API access.",
+                f"Thank you for your message about '{input_text[:30]}...'. I'm operating in local mode without OpenAI API access.",
+                f"I received your message about '{input_text[:30]}...'. I'm a demonstration version of RALPH without actual API connectivity.",
+                f"I appreciate your question about '{input_text[:30]}...'. I'm currently running without API keys in simulation mode."
+            ]
+            
+            response = random.choice(simulated_responses)
+            
             return {
-                "result": f"Primary model response for: {input_text[:30]}...",
+                "result": response,
                 "model": self.model,
                 "confidence": 0.95
             }

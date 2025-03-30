@@ -1,0 +1,42 @@
+[
+  {
+    "content": "are you awake?",
+    "importance": 0.33919999999999995,
+    "context": {},
+    "timestamp": 1743358111.0216963,
+    "access_count": 5,
+    "last_access": 1743358307.3076327
+  },
+  {
+    "content": "hello",
+    "importance": 0.424,
+    "context": {},
+    "timestamp": 1743358302.1526868,
+    "access_count": 4,
+    "last_access": 1743358364.998959
+  },
+  {
+    "content": "awaken",
+    "importance": 0.4248,
+    "context": {},
+    "timestamp": 1743358307.2918265,
+    "access_count": 2,
+    "last_access": 1743358325.5656278
+  },
+  {
+    "content": "you reside on my machine",
+    "importance": 0.3816,
+    "context": {},
+    "timestamp": 1743358325.5501418,
+    "access_count": 2,
+    "last_access": 1743358364.998959
+  },
+  {
+    "content": "do you posses the ability to understand and be aware of what i am saying to you ralph?",
+    "importance": 0.45655,
+    "context": {},
+    "timestamp": 1743358364.9836667,
+    "access_count": 1,
+    "last_access": 1743358364.9989588
+  }
+]

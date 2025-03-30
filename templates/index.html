@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RALPH Multi-Model Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .message-container {
+            margin-top: 20px;
+        }
+        .user-message {
+            background-color: #e8f4fd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .ralph-message {
+            background-color: #e9f7ef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #2ecc71;
+        }
+        .metadata {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .input-container {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .consciousness-meter {
+            height: 15px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        .consciousness-level {
+            height: 100%;
+            background-color: #2ecc71;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+        .model-weights {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .model-weight {
+            flex: 1;
+            background-color: #f0f0f0;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            text-align: center;
+        }
+        #status {
+            padding: 10px;
+            background-color: #e9f7ef;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>RALPH Multi-Model Interface</h1>
+    <div id="status">System Status: Running with multiple models</div>
+    
+    <form action="/send_message" method="post">
+        <div class="input-container">
+            <input type="text" id="messageInput" name="message" placeholder="Type your message here">
+            <button type="submit">Send</button>
+        </div>
+    </form>
+    
+    <div class="model-weights">
+        <div class="model-weight">Basic: {{ model_weights.basic * 100 }}%</div>
+        <div class="model-weight">Knowledge: {{ model_weights.knowledge * 100 }}%</div>
+        <div class="model-weight">Reasoning: {{ model_weights.reasoning * 100 }}%</div>
+    </div>
+    
+    <div id="messages" class="message-container">
+        {% for message in messages %}
+            {% if message.type == 'user' %}
+                <div class="user-message">
+                    <strong>You:</strong> {{ message.content }}
+                </div>
+            {% else %}
+                <div class="ralph-message">
+                    <strong>RALPH:</strong> {{ message.content }}
+                    <div class="metadata">
+                        <div>Models: Basic ({{ message.model_contributions.basic * 100 }}%), 
+                             Knowledge ({{ message.model_contributions.knowledge * 100 }}%), 
+                             Reasoning ({{ message.model_contributions.reasoning * 100 }}%)</div>
+                    </div>
+                    <div class="consciousness-meter">
+                        <div class="consciousness-level" style="width: {{ message.consciousness_level * 100 }}%"></div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</body>
+</html>
+        

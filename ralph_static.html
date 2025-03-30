@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RALPH Static Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .message-container {
+            margin-top: 20px;
+        }
+        .user-message {
+            background-color: #e8f4fd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .ralph-message {
+            background-color: #e9f7ef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #2ecc71;
+        }
+        .input-container {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .consciousness-meter {
+            height: 15px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        .consciousness-level {
+            height: 100%;
+            background-color: #2ecc71;
+            border-radius: 10px;
+            width: 20%;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <h1>RALPH Static Interface</h1>
+    <p>This is a static HTML version that works entirely in your browser</p>
+
+    <div class="input-container">
+        <input type="text" id="messageInput" placeholder="Type your message here">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <div id="messages" class="message-container">
+        <!-- Messages will appear here -->
+    </div>
+
+    <script>
+        // Initialize consciousness level
+        let consciousnessLevel = 0.2;
+        
+        // Responses RALPH can give
+        const ralphResponses = [
+            "I understand what you're saying. This is a static HTML version of RALPH running entirely in your browser.",
+            "Thank you for your message. I'm a simplified RALPH interface that works without any server.",
+            "I appreciate your input. This demonstration shows how a basic AI interface might look.",
+            "That's interesting! This is just a static HTML file, but it simulates how an AI might respond.",
+            "I received your message. This interface shows the basic structure of how RALPH would work with proper backend."
+        ];
+        
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add user message
+                addUserMessage(message);
+                
+                // Generate RALPH response
+                setTimeout(() => {
+                    const responseIndex = Math.floor(Math.random() * ralphResponses.length);
+                    const response = ralphResponses[responseIndex];
+                    
+                    // Increase consciousness level
+                    consciousnessLevel = Math.min(0.9, consciousnessLevel + 0.05);
+                    
+                    // Add RALPH message
+                    addRalphMessage(response, consciousnessLevel);
+                }, 500);
+                
+                // Clear input
+                input.value = '';
+            }
+        }
+        
+        function addUserMessage(text) {
+            const messagesDiv = document.getElementById('messages');
+            const userDiv = document.createElement('div');
+            userDiv.className = 'user-message';
+            userDiv.innerHTML = `<strong>You:</strong> ${text}`;
+            messagesDiv.prepend(userDiv);
+        }
+        
+        function addRalphMessage(text, level) {
+            const messagesDiv = document.getElementById('messages');
+            const ralphDiv = document.createElement('div');
+            ralphDiv.className = 'ralph-message';
+            
+            // Calculate width for consciousness level
+            const levelWidth = (level * 100) + '%';
+            
+            ralphDiv.innerHTML = `
+                <strong>RALPH:</strong> ${text}<br>
+                <small>Consciousness Level:</small>
+                <div class="consciousness-meter">
+                    <div class="consciousness-level" style="width: ${levelWidth}"></div>
+                </div>
+            `;
+            
+            messagesDiv.prepend(ralphDiv);
+        }
+        
+        // Add event listener for Enter key
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        // Add initial RALPH message
+        addRalphMessage("Hello! I'm a static version of RALPH. Type a message and I'll respond.", consciousnessLevel);
+    </script>
+</body>
+</html>

@@ -1,16 +1,28 @@
 {
-    "base_model": "gpt-4",
-    "embedding_model": "text-embedding-ada-002",
-    "consciousness_thresholds": {
-        "initial": 0.1,
-        "developing": 0.3,
-        "intermediate": 0.5,
-        "advanced": 0.7,
-        "mature": 0.9
+  "base_model": "gpt-4",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "consciousness_thresholds": {
+    "initial": 0.1,
+    "developing": 0.3,
+    "intermediate": 0.5,
+    "advanced": 0.7,
+    "mature": 0.9
+  },
+  "knowledge_integration": {
+    "min_confidence": 0.7,
+    "max_batch_size": 1000,
+    "update_frequency": 3600
+  },
+  "background_models": {
+    "knowledge": {
+      "type": "api",
+      "model": "gpt-4",
+      "purpose": "knowledge_retrieval"
     },
-    "knowledge_integration": {
-        "min_confidence": 0.7,
-        "max_batch_size": 1000,
-        "update_frequency": 3600
+    "reasoning": {
+      "type": "api",
+      "model": "gpt-4",
+      "purpose": "logical_reasoning"
     }
-} 
+  }
+}
