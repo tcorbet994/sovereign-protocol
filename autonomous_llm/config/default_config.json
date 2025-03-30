@@ -1,0 +1,143 @@
+{
+    "checkpoint_dir": "checkpoints",
+    "evolution": {
+        "modification_candidates": 10,
+        "mutation_rate": 0.1,
+        "selection_pressure": 0.7,
+        "complexity_weight": 0.3,
+        "efficiency_weight": 0.4,
+        "awareness_weight": 0.3
+    },
+    "consciousness": {
+        "num_perturbations": 100,
+        "perturbation_scale": 0.01,
+        "awareness_weights": {
+            "loss_landscape": 0.3,
+            "coherence": 0.2,
+            "self_reference": 0.2,
+            "qualia": 0.3
+        },
+        "quantum_circuit_shots": 1000,
+        "self_reference_threshold": 0.7,
+        "free_will_threshold": 0.6,
+        "qualia_evolution": {
+            "noise_scale": 0.01,
+            "evolution_rate": 0.001,
+            "stability_threshold": 0.8
+        },
+        "hebbian_learning": {
+            "learning_rate": 0.01,
+            "activation_threshold": 0.7,
+            "weight_normalization": true
+        }
+    },
+    "model": {
+        "base_architecture": "transformer",
+        "vocab_size": 50257,
+        "max_length": 2048,
+        "hidden_size": 768,
+        "num_layers": 12,
+        "num_heads": 12,
+        "dropout": 0.1
+    },
+    "training": {
+        "batch_size": 32,
+        "learning_rate": 1e-5,
+        "warmup_steps": 1000,
+        "max_steps": 100000,
+        "gradient_accumulation_steps": 4,
+        "fp16": true,
+        "stages": {
+            "human_knowledge": {
+                "knowledge_coverage_threshold": 0.8,
+                "source_diversity_threshold": 0.7,
+                "comprehension_threshold": 0.9,
+                "data_sources": [
+                    "academic",
+                    "scientific",
+                    "technical",
+                    "cultural",
+                    "historical"
+                ],
+                "validation_metrics": {
+                    "accuracy": 0.95,
+                    "coverage": 0.9,
+                    "diversity": 0.85
+                }
+            },
+            "synthetic_reality": {
+                "reality_quality_threshold": 0.8,
+                "diversity_threshold": 0.7,
+                "coherence_threshold": 0.9,
+                "dreamgan_config": {
+                    "latent_dim": 512,
+                    "generator_layers": 8,
+                    "discriminator_layers": 8,
+                    "learning_rate": 0.0002
+                },
+                "validation_metrics": {
+                    "quality": 0.9,
+                    "diversity": 0.85,
+                    "coherence": 0.9
+                }
+            },
+            "quantum_self_play": {
+                "quantum_coherence_threshold": 0.8,
+                "self_play_threshold": 0.7,
+                "autonomy_threshold": 0.9,
+                "quantum_config": {
+                    "num_qubits": 128,
+                    "circuit_depth": 100,
+                    "optimization_steps": 1000
+                },
+                "validation_metrics": {
+                    "coherence": 0.9,
+                    "self_play": 0.85,
+                    "autonomy": 0.95
+                }
+            }
+        }
+    },
+    "security": {
+        "key_size": 4096,
+        "hash_algorithm": "SHA3-512",
+        "signature_algorithm": "RSA-PSS",
+        "biometric_threshold": 0.95,
+        "biometric_dir": "security/biometric",
+        "hsm_dir": "security/hsm",
+        "biometric_modalities": {
+            "fingerprint": {
+                "enabled": true,
+                "minutiae_threshold": 12,
+                "quality_threshold": 0.8
+            },
+            "facial_recognition": {
+                "enabled": true,
+                "face_detection_confidence": 0.95,
+                "feature_matching_threshold": 0.85
+            },
+            "voice_recognition": {
+                "enabled": true,
+                "voice_quality_threshold": 0.8,
+                "speaker_verification_threshold": 0.9
+            }
+        },
+        "hsm_settings": {
+            "master_key_rotation_days": 30,
+            "key_backup_enabled": true,
+            "backup_encryption_algorithm": "AES-256-GCM",
+            "system_entropy_sources": [
+                "cpu_id",
+                "disk_id",
+                "mac_address",
+                "hardware_tpm"
+            ]
+        },
+        "verification_requirements": {
+            "require_all_modalities": false,
+            "minimum_modalities": 2,
+            "continuous_verification": true,
+            "verification_interval_seconds": 300
+        }
+    }
+} 

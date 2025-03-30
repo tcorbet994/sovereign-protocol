@@ -1,0 +1,3 @@
+@echo off
+echo Starting Sovereign Protocol...
+start "" "dist\SovereignProtocol.exe" 
